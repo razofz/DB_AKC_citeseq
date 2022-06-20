@@ -6,9 +6,10 @@ configfile: "config.yaml"
 
 rule produce_unprocessed_seurat_object:
     input:
-        filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5"
+        filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5",
     output:
-        seurat_object_unprocessed=config["interim_dir"] + "seurat_object_unprocessed.rds",
+        seurat_object_unprocessed=config["interim_dir"]
+        + "seurat_object_unprocessed.rds",
         cell_whitelist=config["interim_dir"] + "cell_whitelist.tsv",
     conda:
         "envs/DB_AKC_R.yaml"
@@ -21,7 +22,7 @@ raw_counts_dir = config["interim_dir"] + "raw_counts_htos/"
 
 rule write_raw_counts_hto:
     input:
-        raw_counts=config["raw_dir"] + "raw_feature_bc_matrix/"
+        raw_counts=config["raw_dir"] + "raw_feature_bc_matrix/",
     output:
         barcodes=raw_counts_dir + "barcodes.tsv",
         features=raw_counts_dir + "features.tsv",
@@ -57,8 +58,10 @@ rule run_cellhashr:
         mtx=rules.gzip_raw_counts_hto.output.mtx,
         cell_whitelist=rules.produce_unprocessed_seurat_object.output.cell_whitelist,
     output:
-        metrics_file_ProcessCountMatrix=cellhashr_dir + "metrics_file_ProcessCountMatrix.tsv",
-        metrics_file_GenerateCellHashingCalls=cellhashr_dir + "metrics_file_GenerateCellHashingCall.tsv",
+        metrics_file_ProcessCountMatrix=cellhashr_dir
+        + "metrics_file_ProcessCountMatrix.tsv",
+        metrics_file_GenerateCellHashingCalls=cellhashr_dir
+        + "metrics_file_GenerateCellHashingCall.tsv",
         rplots_pdf=cellhashr_dir + "hashing_plots.pdf",
         demultiplexing_results=cellhashr_dir + "demultiplexing_results.tsv",
     container:
@@ -77,9 +80,9 @@ rule plot_hto_distribution:
         seurat_object_unprocessed=rules.produce_unprocessed_seurat_object.output.seurat_object_unprocessed,
         demultiplexing_results=rules.run_cellhashr.output.demultiplexing_results,
     output:
-        hto_distribution_cellhashr=HTO_out_dir + "HTO_distribution.svg",
+        hto_distribution_cellhashr=report(
+            HTO_out_dir + "HTO_distribution.svg", category="demultiplexing"
+        ),
         seurat_object_demultiplexed=HTO_out_dir + "seurat_object_demultiplexed.rds",
     script:
         "src/smk/demultiplexing/post-cellhashr.R"
-
-
