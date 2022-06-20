@@ -4,18 +4,6 @@ import os
 configfile: "config.yaml"
 
 
-# rule demultiplex:
-#     input:
-#         mtx=config["raw_dir"] + "filtered_bc_matrix/matrix.mtx",
-#         features=config["raw_dir"] + "filtered_bc_matrix/features.tsv",
-#         barcodes=config["raw_dir"] + "filtered_bc_matrix/barcodes.tsv",
-#         # h5=config["raw_dir"] + "filtered_bc_matrix.h5",
-#     output:
-#         rds=config["processed_dir"] + "demultiplexed_seurat_object.rds",
-#     script:
-#         "src/demultiplex.R"
-
-
 rule produce_unprocessed_seurat_object:
     input:
         filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5"
