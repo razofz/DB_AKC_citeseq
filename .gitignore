@@ -1,5 +1,6 @@
 project_path
 .snakemake
+envs/all-envs.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
