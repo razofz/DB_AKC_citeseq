@@ -1,0 +1,12 @@
+name: DB_AKC_gzip
+channels:
+  - conda-forge
+  - defaults
+  - bioconda
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - gzip=1.12
+  - libgcc-ng=12.1.0
+  - libgomp=12.1.0
+prefix: /home/raz/anaconda3/envs/DB_AKC_gzip
