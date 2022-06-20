@@ -1,4 +1,8 @@
-library(cellhashR)
+lapply(list(
+  "cellhashR"
+), FUN = function(x) {
+  suppressPackageStartupMessages(library(x, character.only = T))
+})
 
 
 set.seed(snakemake@config[["seed"]])

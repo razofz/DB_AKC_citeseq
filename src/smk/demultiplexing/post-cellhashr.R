@@ -1,6 +1,10 @@
-library(stringr)
-library(ggplot2)
-library(Seurat)
+lapply(list(
+  "stringr",
+  "ggplot2",
+  "Seurat"
+), FUN = function(x) {
+  suppressPackageStartupMessages(library(x, character.only = T))
+})
 
 
 set.seed(snakemake@config[["seed"]])

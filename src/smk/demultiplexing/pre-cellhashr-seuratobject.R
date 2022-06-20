@@ -1,5 +1,9 @@
-library(Seurat)
-library(stringr)
+lapply(list(
+  "stringr",
+  "Seurat"
+), FUN = function(x) {
+  suppressPackageStartupMessages(library(x, character.only = T))
+})
 
 
 set.seed(snakemake@config[["seed"]])
