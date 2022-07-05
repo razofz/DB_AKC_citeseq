@@ -37,3 +37,13 @@ project_name: "DB_AKC_citeseq"
 n_threads: 16
 max_memory_to_use_in_gb: 60
 seed: 12345
+filtering_params:
+  max_RNA_counts: 60000
+  min_RNA_counts: 5000
+  max_RNA_features: 9000
+  min_RNA_features: 2000
+  max_ADT_counts: 900
+  min_ADT_counts: 25
+  max_HTO_counts: 400
+  min_HTO_counts: 20
+  max_mitochondrial_percentage: 6

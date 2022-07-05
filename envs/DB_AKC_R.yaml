@@ -9,13 +9,14 @@ dependencies:
   - _r-mutex=1.0.1
   - binutils_impl_linux-64=2.36.1
   - binutils_linux-64=2.36
+  - bioconductor-limma=3.50.1
   - brotlipy=0.7.0
   - bwidget=1.9.14
   - bzip2=1.0.8
   - c-ares=1.18.1
-  - ca-certificates=2022.5.18.1
+  - ca-certificates=2022.6.15
   - cairo=1.16.0
-  - certifi=2022.5.18.1
+  - certifi=2022.6.15
   - cffi=1.15.0
   - charset-normalizer=2.0.12
   - colorama=0.4.4
@@ -92,7 +93,7 @@ dependencies:
   - make=4.3
   - mamba=0.24.0
   - ncurses=6.3
-  - openssl=1.1.1o
+  - openssl=1.1.1p
   - pango=1.50.7
   - pcre=8.45
   - pcre2=10.37

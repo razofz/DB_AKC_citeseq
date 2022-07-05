@@ -81,8 +81,138 @@ rule plot_hto_distribution:
         demultiplexing_results=rules.run_cellhashr.output.demultiplexing_results,
     output:
         hto_distribution_cellhashr=report(
-            HTO_out_dir + "HTO_distribution.svg", category="demultiplexing"
+            HTO_out_dir + "HTO_distribution.svg", category="Demultiplexing"
         ),
         seurat_object_demultiplexed=HTO_out_dir + "seurat_object_demultiplexed.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
     script:
         "src/smk/demultiplexing/post-cellhashr.R"
+
+
+filtering_dir = config["processed_dir"] + "seurat_filtering/"
+
+
+rule plot_prefiltering:
+    input:
+        seurat_object=rules.plot_hto_distribution.output.seurat_object_demultiplexed,
+    output:
+        RNA_vln=report(filtering_dir + "pre_RNA.svg", category="Filtering"),
+        RNA_vln_log=report(filtering_dir + "pre_RNA_log.svg", category="Filtering"),
+        ADT_vln=report(filtering_dir + "pre_ADT.svg", category="Filtering"),
+        ADT_vln_log=report(filtering_dir + "pre_ADT_log.svg", category="Filtering"),
+        HTO_vln=report(filtering_dir + "pre_HTO.svg", category="Filtering"),
+        HTO_vln_log=report(filtering_dir + "pre_HTO_log.svg", category="Filtering"),
+        mito_vln=report(filtering_dir + "pre_mito.svg", category="Filtering"),
+        mito_vln_log=report(filtering_dir + "pre_mito_log.svg", category="Filtering"),
+        seurat_object=filtering_dir + "seurat_object_prefiltering.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/seurat-prefiltering.R"
+
+
+rule filtering:
+    input:
+        seurat_object=rules.plot_prefiltering.output.seurat_object,
+    output:
+        RNA_vln=report(filtering_dir + "post_RNA.svg", category="Filtering"),
+        RNA_vln_log=report(filtering_dir + "post_RNA_log.svg", category="Filtering"),
+        ADT_vln=report(filtering_dir + "post_ADT.svg", category="Filtering"),
+        ADT_vln_log=report(filtering_dir + "post_ADT_log.svg", category="Filtering"),
+        HTO_vln=report(filtering_dir + "post_HTO.svg", category="Filtering"),
+        HTO_vln_log=report(filtering_dir + "post_HTO_log.svg", category="Filtering"),
+        mito_vln=report(filtering_dir + "post_mito.svg", category="Filtering"),
+        mito_vln_log=report(filtering_dir + "post_mito_log.svg", category="Filtering"),
+        hto_distribution_cellhashr=report(
+            HTO_out_dir + "HTO_distribution_post_filtering.svg",
+            category="Demultiplexing",
+        ),
+        seurat_object=filtering_dir + "seurat_object_filtered.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/seurat-filtering.R"
+
+
+seurat_processing_all_dir = config["processed_dir"] + "seurat_processing_all/"
+
+
+rule seurat_processing_all:
+    input:
+        seurat_object=rules.filtering.output.seurat_object,
+    output:
+        hvgs=seurat_processing_all_dir + "highly_variable_genes.tsv",
+        seurat_object=seurat_processing_dir + "seurat_object.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/seurat_processing_all.R"
+
+
+rule seurat_umap_plotting:
+    input:
+        seurat_object=rules.seurat_processing_all.output.seurat_object,
+    output:
+        umap_clusters=report(
+            seurat_processing_all_dir + "umap_clusters.svg", category="Seurat processing"
+        ),
+        umap_clusters_unlabelled=report(
+            seurat_processing_all_dir + "umap_clusters_unlabelled.svg",
+            category="Seurat processing",
+        ),
+        umap_hto=report(
+            seurat_processing_all_dir + "umap_hto.svg", category="Seurat processing"
+        ),
+        umap_sample=report(
+            seurat_processing_all_dir + "umap_sample.svg", category="Seurat processing"
+        ),
+        umap_incubation_method=report(
+            seurat_processing_all_dir + "umap_incubation_method.svg",
+            category="Seurat processing",
+        ),
+        umap_buffer_treatment=report(
+            seurat_processing_all_dir + "umap_buffer_treatment.svg",
+            category="Seurat processing",
+        ),
+        umap_cellcycle=report(
+            seurat_processing_all_dir + "umap_cellcycle.svg",
+            category="Seurat processing",
+        ),
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/seurat-umap-plotting.R"
+
+
+rule seurat_deg:
+    input:
+        seurat_object=rules.seurat_processing_all.output.seurat_object,
+    output:
+        deg_hto2_vs_hto4=seurat_processing_all_dir + "deg_hto2_vs_hto4.tsv",
+        deg_hto13_vs_hto4=seurat_processing_all_dir + "deg_hto13_vs_hto4.tsv",
+        deg_hto13_vs_hto2=seurat_processing_all_dir + "deg_hto13_vs_hto2.tsv",
+        deg_ice_vs_37c=seurat_processing_all_dir + "deg_ice_vs_37c.tsv",
+        deg_cl69_vs_rest_cl_ice=seurat_processing_all_dir + "deg_cl69_vs_rest_cl_ice.tsv",
+        deg_cl7_vs_rest_cl_37c_t=seurat_processing_all_dir + "deg_cl7_vs_rest_cl_37c_t.tsv",
+        deg_cl8_vs_rest_cl_37c_no_t=seurat_processing_all_dir
+        + "deg_cl8_vs_rest_cl_37c_no_t.tsv",
+        # seurat_object=seurat_processing_all_dir + "seurat_object_with_deg.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/seurat-DEG.R"
+
+
+seurat_processing_ice_dir = config["processed_dir"] + "seurat_processing_ice/"
+
+
+rule ice_seurat_processing:
+    input:
+        seurat_object_all=rules.filtering.seurat_object_filtered,
+    output:
+        seurat_object_ice=seurat_processing_ice_dir + "seurat_object.rds",
+    script:
+        "src/smk/seurat_processing_ice.R"
+
+
