@@ -57,11 +57,11 @@ sobj <- CellCycleScoring(sobj,
   g2m.features = str_to_title(cc.genes$g2m.genes),
   set.ident = T
 )
-sobj <- ScaleData(sobj,
-  vars.to.regress = c("S.Score", "G2M.Score"),
-  assay = "RNA",
-  features = rownames(sobj)
-)
+# sobj <- ScaleData(sobj,
+#   vars.to.regress = c("S.Score", "G2M.Score"),
+#   assay = "RNA",
+#   features = rownames(sobj)
+# )
 
 sobj <- RunPCA(sobj, assay = "RNA", seed.use = snakemake@config[["seed"]])
 sobj <- FindNeighbors(sobj, assay = "RNA", reduction = "pca", dims = 1:30)
@@ -70,10 +70,5 @@ sobj <- RunUMAP(sobj,
   dims = 1:30, reduction = "pca",
   assay = "RNA", return.model = T
 )
-
-# p <- DimPlot(sobj, group.by = "seurat_clusters") + coord_fixed()
-# ggsave(snakemake@output[["umap_clusters"]], plot = p, device = "svg")
-# p <- DimPlot(sobj, group.by = "hto") + coord_fixed()
-# ggsave(snakemake@output[["umap_hto"]], plot = p, device = "svg")
 
 saveRDS(sobj, snakemake@output[["seurat_object"]])

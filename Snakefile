@@ -143,7 +143,7 @@ rule seurat_processing_all:
         seurat_object=rules.filtering.output.seurat_object,
     output:
         hvgs=seurat_processing_all_dir + "highly_variable_genes.tsv",
-        seurat_object=seurat_processing_dir + "seurat_object.rds",
+        seurat_object=seurat_processing_all_dir + "seurat_object.rds",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
@@ -155,17 +155,20 @@ rule seurat_umap_plotting:
         seurat_object=rules.seurat_processing_all.output.seurat_object,
     output:
         umap_clusters=report(
-            seurat_processing_all_dir + "umap_clusters.svg", category="Seurat processing"
+            seurat_processing_all_dir + "umap_clusters.svg",
+            category="Seurat processing"
         ),
         umap_clusters_unlabelled=report(
             seurat_processing_all_dir + "umap_clusters_unlabelled.svg",
             category="Seurat processing",
         ),
         umap_hto=report(
-            seurat_processing_all_dir + "umap_hto.svg", category="Seurat processing"
+            seurat_processing_all_dir + "umap_hto.svg",
+            category="Seurat processing"
         ),
         umap_sample=report(
-            seurat_processing_all_dir + "umap_sample.svg", category="Seurat processing"
+            seurat_processing_all_dir + "umap_sample.svg",
+            category="Seurat processing"
         ),
         umap_incubation_method=report(
             seurat_processing_all_dir + "umap_incubation_method.svg",
@@ -185,19 +188,29 @@ rule seurat_umap_plotting:
         "src/smk/seurat-umap-plotting.R"
 
 
+deg_dir = config["processed_dir"] + "deg/"
+
+
 rule seurat_deg:
     input:
-        seurat_object=rules.seurat_processing_all.output.seurat_object,
+        seurat_object=rules.seurat_processing_all.output.seurat_object, # TODO: take not-cc-removed object
     output:
-        deg_hto2_vs_hto4=seurat_processing_all_dir + "deg_hto2_vs_hto4.tsv",
-        deg_hto13_vs_hto4=seurat_processing_all_dir + "deg_hto13_vs_hto4.tsv",
-        deg_hto13_vs_hto2=seurat_processing_all_dir + "deg_hto13_vs_hto2.tsv",
-        deg_ice_vs_37c=seurat_processing_all_dir + "deg_ice_vs_37c.tsv",
-        deg_cl69_vs_rest_cl_ice=seurat_processing_all_dir + "deg_cl69_vs_rest_cl_ice.tsv",
-        deg_cl7_vs_rest_cl_37c_t=seurat_processing_all_dir + "deg_cl7_vs_rest_cl_37c_t.tsv",
-        deg_cl8_vs_rest_cl_37c_no_t=seurat_processing_all_dir
-        + "deg_cl8_vs_rest_cl_37c_no_t.tsv",
-        # seurat_object=seurat_processing_all_dir + "seurat_object_with_deg.rds",
+        deg_S_triptolides=deg_dir + "deg_S_triptolides.tsv",
+        deg_G1_triptolides=deg_dir + "deg_G1_triptolides.tsv",
+        deg_G2M_triptolides=deg_dir + "deg_G2M_triptolides.tsv",
+        deg_S_no_triptolides=deg_dir + "deg_S_no_triptolides.tsv",
+        deg_G1_no_triptolides=deg_dir + "deg_G1_no_triptolides.tsv",
+        deg_G2M_no_triptolides=deg_dir + "deg_G2M_no_triptolides.tsv",
+        deg_S_ice_vs_37c_t=deg_dir + "deg_S_ice_vs_37c_t.tsv",
+        deg_G1_ice_vs_37c_t=deg_dir + "deg_G1_ice_vs_37c_t.tsv",
+        deg_G2M_ice_vs_37c_t=deg_dir + "deg_G2M_ice_vs_37c_t.tsv",
+        deg_S_ice_vs_37c_no_t=deg_dir + "deg_S_ice_vs_37c_no_t.tsv",
+        deg_G1_ice_vs_37c_no_t=deg_dir + "deg_G1_ice_vs_37c_no_t.tsv",
+        deg_G2M_ice_vs_37c_no_t=deg_dir + "deg_G2M_ice_vs_37c_no_t.tsv",
+        deg_S_37c_no_t_vs_37c_t=deg_dir + "deg_S_37c_no_t_vs_37c_t.tsv",
+        deg_G1_37c_no_t_vs_37c_t=deg_dir + "deg_G1_37c_no_t_vs_37c_t.tsv",
+        deg_G2M_37c_no_t_vs_37c_t=deg_dir + "deg_G2M_37c_no_t_vs_37c_t.tsv",
+        # seurat_object=deg_dir + "seurat_object_with_deg.rds",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
@@ -209,7 +222,7 @@ seurat_processing_ice_dir = config["processed_dir"] + "seurat_processing_ice/"
 
 rule ice_seurat_processing:
     input:
-        seurat_object_all=rules.filtering.seurat_object_filtered,
+        seurat_object_all=rules.filtering.output.seurat_object,
     output:
         seurat_object_ice=seurat_processing_ice_dir + "seurat_object.rds",
     script:
