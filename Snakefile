@@ -14,7 +14,7 @@ rule produce_unprocessed_seurat_object:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/demultiplexing/pre-cellhashr-seuratobject.R"
+        "src/smk/demultiplexing/pre_cellhashr_seuratobject.R"
 
 
 raw_counts_dir = config["interim_dir"] + "raw_counts_htos/"
@@ -30,7 +30,7 @@ rule write_raw_counts_hto:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/demultiplexing/pre-cellhashr.R"
+        "src/smk/demultiplexing/pre_cellhashr.R"
 
 
 rule gzip_raw_counts_hto:
@@ -69,25 +69,36 @@ rule run_cellhashr:
     resources:
         mem_mb=config["max_memory_to_use_in_gb"] * 1000,
     script:
-        "src/smk/demultiplexing/run-cellhashr.R"
+        "src/smk/demultiplexing/run_cellhashr.R"
 
 
 HTO_out_dir = config["processed_dir"] + "HTO_demultiplexed/"
 
 
-rule plot_hto_distribution:
+rule post_cellhashr:
     input:
         seurat_object_unprocessed=rules.produce_unprocessed_seurat_object.output.seurat_object_unprocessed,
         demultiplexing_results=rules.run_cellhashr.output.demultiplexing_results,
     output:
-        hto_distribution_cellhashr=report(
-            HTO_out_dir + "HTO_distribution.svg", category="Demultiplexing"
-        ),
         seurat_object_demultiplexed=HTO_out_dir + "seurat_object_demultiplexed.rds",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/demultiplexing/post-cellhashr.R"
+        "src/smk/demultiplexing/post_cellhashr.R"
+
+
+rule plot_hto_distribution:
+    input:
+        seurat_object=rules.plot_hto_distribution.output.seurat_object_demultiplexed,
+    output:
+        hto_distribution_cellhashr=report(
+            HTO_out_dir + "HTO_distribution.svg",
+            category="Demultiplexing"
+        ),
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/plot_hto_distribution.R"
 
 
 filtering_dir = config["processed_dir"] + "seurat_filtering/"
@@ -105,16 +116,26 @@ rule plot_prefiltering:
         HTO_vln_log=report(filtering_dir + "pre_HTO_log.svg", category="Filtering"),
         mito_vln=report(filtering_dir + "pre_mito.svg", category="Filtering"),
         mito_vln_log=report(filtering_dir + "pre_mito_log.svg", category="Filtering"),
-        seurat_object=filtering_dir + "seurat_object_prefiltering.rds",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/seurat-prefiltering.R"
+        "src/smk/plot_prefiltering.R"
 
 
 rule filtering:
     input:
-        seurat_object=rules.plot_prefiltering.output.seurat_object,
+        seurat_object=rules.post_cellhashr.output.seurat_object,
+    output:
+        seurat_object=filtering_dir + "seurat_object_filtered.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/seurat_filtering.R"
+
+
+rule filtering:
+    input:
+        seurat_object=rules.filtering.output.seurat_object,
     output:
         RNA_vln=report(filtering_dir + "post_RNA.svg", category="Filtering"),
         RNA_vln_log=report(filtering_dir + "post_RNA_log.svg", category="Filtering"),
@@ -128,11 +149,10 @@ rule filtering:
             HTO_out_dir + "HTO_distribution_post_filtering.svg",
             category="Demultiplexing",
         ),
-        seurat_object=filtering_dir + "seurat_object_filtered.rds",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/seurat-filtering.R"
+        "src/smk/plot_post_filtering.R"
 
 
 seurat_processing_all_dir = config["processed_dir"] + "seurat_processing_all/"
@@ -185,7 +205,7 @@ rule seurat_umap_plotting:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/seurat-umap-plotting.R"
+        "src/smk/seurat_umap_plotting.R"
 
 
 deg_dir = config["processed_dir"] + "deg/"
@@ -214,7 +234,7 @@ rule seurat_deg:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/seurat-DEG.R"
+        "src/smk/seurat_DEG.R"
 
 
 seurat_processing_ice_dir = config["processed_dir"] + "seurat_processing_ice/"
