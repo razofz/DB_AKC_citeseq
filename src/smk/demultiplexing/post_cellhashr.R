@@ -6,7 +6,6 @@ invisible(lapply(list(
   suppressPackageStartupMessages(library(x, character.only = T))
 }))
 
-
 set.seed(snakemake@config[["seed"]])
 
 sobj <- readRDS(file = snakemake@input[["seurat_object_unprocessed"]])
@@ -33,10 +32,8 @@ classifications <- as.data.frame(classifications)
 classifications$colour <- c(NA, NA, 1, 2, 3, 4, NA, NA)
 classifications$colour <- as.factor(classifications$colour)
 
-ggplot(classifications, aes(x = Var1, y = Freq, fill = colour)) +
-  geom_bar(stat = "identity") + scale_fill_discrete() +
-  NoLegend() + xlab("Global classification") +
-  ylab("barcodes")
+sobj[["percent.mt"]] <- PercentageFeatureSet(sobj,
+  pattern = "^mt-", assay = "RNA"
+)
 
-ggsave(snakemake@output[["hto_distribution_cellhashr"]], device = "svg")
 saveRDS(sobj, snakemake@output[["seurat_object_demultiplexed"]])
