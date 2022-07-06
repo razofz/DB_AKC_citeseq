@@ -87,26 +87,12 @@ rule post_cellhashr:
         "src/smk/demultiplexing/post_cellhashr.R"
 
 
-rule plot_hto_distribution:
-    input:
-        seurat_object=rules.plot_hto_distribution.output.seurat_object_demultiplexed,
-    output:
-        hto_distribution_cellhashr=report(
-            HTO_out_dir + "HTO_distribution.svg",
-            category="Demultiplexing"
-        ),
-    conda:
-        "envs/DB_AKC_R.yaml"
-    script:
-        "src/smk/plot_hto_distribution.R"
-
-
 filtering_dir = config["processed_dir"] + "seurat_filtering/"
 
 
 rule plot_prefiltering:
     input:
-        seurat_object=rules.plot_hto_distribution.output.seurat_object_demultiplexed,
+        seurat_object=rules.post_cellhashr.output.seurat_object_demultiplexed,
     output:
         RNA_vln=report(filtering_dir + "pre_RNA.svg", category="Filtering"),
         RNA_vln_log=report(filtering_dir + "pre_RNA_log.svg", category="Filtering"),
@@ -116,6 +102,10 @@ rule plot_prefiltering:
         HTO_vln_log=report(filtering_dir + "pre_HTO_log.svg", category="Filtering"),
         mito_vln=report(filtering_dir + "pre_mito.svg", category="Filtering"),
         mito_vln_log=report(filtering_dir + "pre_mito_log.svg", category="Filtering"),
+        hto_distribution_cellhashr=report(
+            HTO_out_dir + "HTO_distribution.svg",
+            category="Demultiplexing"
+        ),
     conda:
         "envs/DB_AKC_R.yaml"
     script:
@@ -124,7 +114,7 @@ rule plot_prefiltering:
 
 rule filtering:
     input:
-        seurat_object=rules.post_cellhashr.output.seurat_object,
+        seurat_object=rules.post_cellhashr.output.seurat_object_demultiplexed,
     output:
         seurat_object=filtering_dir + "seurat_object_filtered.rds",
     conda:
@@ -133,7 +123,7 @@ rule filtering:
         "src/smk/seurat_filtering.R"
 
 
-rule filtering:
+rule plot_filtered:
     input:
         seurat_object=rules.filtering.output.seurat_object,
     output:
@@ -152,7 +142,7 @@ rule filtering:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/plot_post_filtering.R"
+        "src/smk/plot_filtered.R"
 
 
 seurat_processing_all_dir = config["processed_dir"] + "seurat_processing_all/"
@@ -170,7 +160,7 @@ rule seurat_processing_all:
         "src/smk/seurat_processing_all.R"
 
 
-rule seurat_umap_plotting:
+rule plot_umap:
     input:
         seurat_object=rules.seurat_processing_all.output.seurat_object,
     output:
@@ -205,7 +195,7 @@ rule seurat_umap_plotting:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/seurat_umap_plotting.R"
+        "src/smk/visualization/plot_umap.R"
 
 
 deg_dir = config["processed_dir"] + "deg/"
