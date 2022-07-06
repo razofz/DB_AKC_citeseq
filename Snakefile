@@ -109,7 +109,7 @@ rule plot_prefiltering:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/plot_prefiltering.R"
+        "src/smk/visualization/plot_prefiltering.R"
 
 
 rule filtering:
