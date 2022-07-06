@@ -193,7 +193,7 @@ deg_dir = config["processed_dir"] + "deg/"
 
 rule seurat_deg:
     input:
-        seurat_object=rules.seurat_processing_all.output.seurat_object, # TODO: take not-cc-removed object
+        seurat_object=rules.seurat_processing_all.output.seurat_object,
     output:
         deg_S_triptolides=deg_dir + "deg_S_triptolides.tsv",
         deg_G1_triptolides=deg_dir + "deg_G1_triptolides.tsv",
