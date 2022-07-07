@@ -6,21 +6,16 @@ metadata = pd.read_csv(
 )
 
 reader = scarf.CrH5Reader(snakemake.input["filtered_h5"])
-# reader = scarf.CrH5Reader(
-#     "../../raw/cellranger-mm10/filtered_feature_bc_matrix.h5"
-# )
 
 writer = scarf.CrToZarr(
     reader,
     zarr_fn=snakemake.output["zarr_all"],
-    # zarr_fn="ice.zarr",
     chunk_size=(2000, 1000),
 )
 writer.dump(batch_size=1000)
 
 ds = scarf.DataStore(
     snakemake.output["zarr_all"],
-    # "ice.zarr",
     default_assay="RNA",
     nthreads=snakemake.params["threads"],
 )
@@ -48,12 +43,10 @@ htos = ds.cells.fetch_all("hto")
 
 htos_in_37c = ["HTO" + str(i) for i in snakemake.config["sample_groups"]["37c"]]
 is_37c = [True if x in htos_in_37c else False for x in htos]
-# is_37c = [True if x in ["HTO2", "HTO4"] else False for x in htos]
 ds.cells.insert("is_37c", is_37c, overwrite=True)
 
 htos_in_ice = ["HTO" + str(i) for i in snakemake.config["sample_groups"]["ice"]]
 is_ice = [True if x in htos_in_ice else False for x in htos]
-# is_ice = [True if x in ["HTO1", "HTO3"] else False for x in htos]
 ds.cells.insert("is_ice", is_ice, key="I", overwrite=True)
 
 # export ice cells:
@@ -63,7 +56,7 @@ scarf.writers.SubsetZarr(
     cell_key="is_ice",
     reset_cell_filter=False,
     overwrite_existing_file=True,
-)
+).dump()
 
 # export 37c cells:
 scarf.writers.SubsetZarr(
@@ -72,9 +65,4 @@ scarf.writers.SubsetZarr(
     cell_key="is_37c",
     reset_cell_filter=False,
     overwrite_existing_file=True,
-)
-
-# ds.mark_hvgs()
-# ds.make_graph(feat_key="hvgs")
-# ds.run_umap()
-# ds.run_leiden_clustering(resolution=1)
+).dump()
