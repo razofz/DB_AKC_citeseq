@@ -103,8 +103,7 @@ rule plot_prefiltering:
         mito_vln=report(filtering_dir + "pre_mito.svg", category="Filtering"),
         mito_vln_log=report(filtering_dir + "pre_mito_log.svg", category="Filtering"),
         hto_distribution_cellhashr=report(
-            HTO_out_dir + "HTO_distribution.svg",
-            category="Demultiplexing"
+            HTO_out_dir + "HTO_distribution.svg", category="Demultiplexing"
         ),
     conda:
         "envs/DB_AKC_R.yaml"
@@ -142,7 +141,7 @@ rule plot_filtered:
     conda:
         "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/plot_filtered.R"
+        "src/smk/visualization/plot_filtered.R"
 
 
 seurat_processing_all_dir = config["processed_dir"] + "seurat_processing_all/"
@@ -166,19 +165,17 @@ rule plot_umap:
     output:
         umap_clusters=report(
             seurat_processing_all_dir + "umap_clusters.svg",
-            category="Seurat processing"
+            category="Seurat processing",
         ),
         umap_clusters_unlabelled=report(
             seurat_processing_all_dir + "umap_clusters_unlabelled.svg",
             category="Seurat processing",
         ),
         umap_hto=report(
-            seurat_processing_all_dir + "umap_hto.svg",
-            category="Seurat processing"
+            seurat_processing_all_dir + "umap_hto.svg", category="Seurat processing"
         ),
         umap_sample=report(
-            seurat_processing_all_dir + "umap_sample.svg",
-            category="Seurat processing"
+            seurat_processing_all_dir + "umap_sample.svg", category="Seurat processing"
         ),
         umap_incubation_method=report(
             seurat_processing_all_dir + "umap_incubation_method.svg",
@@ -220,22 +217,38 @@ rule seurat_deg:
         deg_S_37c_no_t_vs_37c_t=deg_dir + "deg_S_37c_no_t_vs_37c_t.tsv",
         deg_G1_37c_no_t_vs_37c_t=deg_dir + "deg_G1_37c_no_t_vs_37c_t.tsv",
         deg_G2M_37c_no_t_vs_37c_t=deg_dir + "deg_G2M_37c_no_t_vs_37c_t.tsv",
-        # seurat_object=deg_dir + "seurat_object_with_deg.rds",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
         "src/smk/seurat_DEG.R"
 
 
-seurat_processing_ice_dir = config["processed_dir"] + "seurat_processing_ice/"
-
-
-rule ice_seurat_processing:
+rule export_seurat_data:
     input:
-        seurat_object_all=rules.filtering.output.seurat_object,
+        seurat_object=rules.seurat_processing_all.output.seurat_object,
     output:
-        seurat_object_ice=seurat_processing_ice_dir + "seurat_object.rds",
+        umap_embeddings=seurat_processing_all_dir + "umap_embeddings.csv",
+        metadata=seurat_processing_all_dir + "metadata.csv",
+    conda:
+        "envs/DB_AKC_R.yaml"
     script:
-        "src/smk/seurat_processing_ice.R"
+        "src/smk/seurat_export_data.R"
 
 
+zarr_dir = config["processed_dir"] + "zarr_files/"
+
+
+rule scarf_import_and_split_on_incubation:
+    input:
+        filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5",
+        seurat_metadata=rules.export_seurat_data.output.metadata,
+    output:
+        zarr_all=directory(zarr_dir + "all.zarr"),
+        zarr_ice=directory(zarr_dir + "ice.zarr"),
+        zarr_37c=directory(zarr_dir + "37c.zarr"),
+    conda:
+        "envs/DB_AKC_scarf.yaml"
+    params:
+        threads=config["n_threads"]
+    script:
+        "src/smk/scarf_import_and_split_on_incubation.py"
