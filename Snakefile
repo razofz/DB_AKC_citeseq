@@ -249,6 +249,40 @@ rule scarf_import_and_split_on_incubation:
     conda:
         "envs/DB_AKC_scarf.yaml"
     params:
-        threads=config["n_threads"]
+        threads=config["n_threads"],
     script:
         "src/smk/scarf_import_and_split_on_incubation.py"
+
+
+rule scarf_make_ice_reference:
+    input:
+        zarr_ice=rules.scarf_import_and_split_on_incubation.output.zarr_ice,
+    output:
+        ice_reference_marker=touch(".smk_markers/ice_reference_marker.done"),
+    conda:
+        "envs/DB_AKC_scarf.yaml"
+    params:
+        threads=config["n_threads"],
+    script:
+        "src/smk/scarf_make_ice_reference.py"
+
+
+scarf_dir = config["processed_dir"] + "scarf/"
+
+
+rule scarf_plot_ice_reference:
+    input:
+        zarr_ice=rules.scarf_import_and_split_on_incubation.output.zarr_ice,
+        ice_reference_marker=rules.scarf_make_ice_reference.output.ice_reference_marker,
+    output:
+        plot_umap_clusters=scarf_dir + "ice_umap_clusters.svg",
+        # plot_umap_buffer_treatment=scarf_dir + "ice_umap_buffer_treatment.svg",
+        # plot_umap_hto=scarf_dir + "ice_umap_hto.svg",
+        plot_umap_phase=scarf_dir + "ice_umap_phase.svg",
+        plot_umap_sample=scarf_dir + "ice_umap_sample.svg",
+    conda:
+        "envs/DB_AKC_scarf.yaml"
+    params:
+        threads=config["n_threads"],
+    script:
+        "src/smk/scarf_plot_ice_reference.py"
