@@ -58,6 +58,12 @@ ggsave(
   device = "svg"
 )
 
+classifications <- table(sobj$consensuscall, useNA = "ifany")
+classifications <- as.data.frame(classifications)
+
+classifications$colour <- c(1, 2, 3, 4)
+classifications$colour <- as.factor(classifications$colour)
+
 ggplot(classifications, aes(x = Var1, y = Freq, fill = colour)) +
   geom_bar(stat = "identity") + scale_fill_discrete() +
   NoLegend() + xlab("Global classification") +

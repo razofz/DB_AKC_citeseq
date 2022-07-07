@@ -54,3 +54,16 @@ ggsave(snakemake@output[["mito_vln_log"]],
   ),
   device = "svg"
 )
+
+classifications <- table(sobj$consensuscall, useNA = "ifany")
+classifications <- as.data.frame(classifications)
+
+classifications$colour <- c(NA, NA, 1, 2, 3, 4, NA, NA)
+classifications$colour <- as.factor(classifications$colour)
+
+ggplot(classifications, aes(x = Var1, y = Freq, fill = colour)) +
+  geom_bar(stat = "identity") + scale_fill_discrete() +
+  NoLegend() + xlab("Global classification") +
+  ylab("barcodes")
+
+ggsave(snakemake@output[["hto_distribution_cellhashr"]], device = "svg")

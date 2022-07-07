@@ -106,3 +106,4 @@ for (phase in c("S", "G1", "G2M")) {
     cells_2 = intersect(cells$i37c_no_t, cells[[phase]]),
     output_name = str_c("deg_", phase, "_37c_no_t_vs_37c_t")
   )
+}
