@@ -202,12 +202,12 @@ rule seurat_deg:
     input:
         seurat_object=rules.seurat_processing_all.output.seurat_object,
     output:
-        deg_S_triptolides=deg_dir + "deg_S_triptolides.tsv",
-        deg_G1_triptolides=deg_dir + "deg_G1_triptolides.tsv",
-        deg_G2M_triptolides=deg_dir + "deg_G2M_triptolides.tsv",
-        deg_S_no_triptolides=deg_dir + "deg_S_no_triptolides.tsv",
-        deg_G1_no_triptolides=deg_dir + "deg_G1_no_triptolides.tsv",
-        deg_G2M_no_triptolides=deg_dir + "deg_G2M_no_triptolides.tsv",
+        deg_S_ice_t_vs_37c_t=deg_dir + "deg_S_ice_t_vs_37c_t.tsv",
+        deg_G1_ice_t_vs_37c_t=deg_dir + "deg_G1_ice_t_vs_37c_t.tsv",
+        deg_G2M_ice_t_vs_37c_t=deg_dir + "deg_G2M_ice_t_vs_37c_t.tsv",
+        deg_S_ice_no_t_vs_37c_no_t=deg_dir + "deg_S_ice_no_t_vs_37c_no_t.tsv",
+        deg_G1_ice_no_t_vs_37c_no_t=deg_dir + "deg_G1_ice_no_t_vs_37c_no_t.tsv",
+        deg_G2M_ice_no_t_vs_37c_no_t=deg_dir + "deg_G2M_ice_no_t_vs_37c_no_t.tsv",
         deg_S_ice_vs_37c_t=deg_dir + "deg_S_ice_vs_37c_t.tsv",
         deg_G1_ice_vs_37c_t=deg_dir + "deg_G1_ice_vs_37c_t.tsv",
         deg_G2M_ice_vs_37c_t=deg_dir + "deg_G2M_ice_vs_37c_t.tsv",
@@ -217,10 +217,45 @@ rule seurat_deg:
         deg_S_37c_no_t_vs_37c_t=deg_dir + "deg_S_37c_no_t_vs_37c_t.tsv",
         deg_G1_37c_no_t_vs_37c_t=deg_dir + "deg_G1_37c_no_t_vs_37c_t.tsv",
         deg_G2M_37c_no_t_vs_37c_t=deg_dir + "deg_G2M_37c_no_t_vs_37c_t.tsv",
+        deg_S_ice_no_t_vs_ice_t=deg_dir + "deg_S_ice_no_t_vs_ice_t.tsv",
+        deg_G1_ice_no_t_vs_ice_t=deg_dir + "deg_G1_ice_no_t_vs_ice_t.tsv",
+        deg_G2M_ice_no_t_vs_ice_t=deg_dir + "deg_G2M_ice_no_t_vs_ice_t.tsv",
     conda:
         "envs/DB_AKC_R.yaml"
     script:
         "src/smk/seurat_DEG.R"
+
+
+rule seurat_stress_signature:
+    input:
+        seurat_object=rules.seurat_processing_all.output.seurat_object,
+        stress_signature=config["raw_base_dir"] + "stress_signature.tsv",
+    output:
+        seurat_object=config["processed_dir"] + "seurat_object_w_stress_sig.rds",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/add_gene_signatures.R"
+
+
+rule plot_stress_signature:
+    input:
+        seurat_object=rules.seurat_stress_signature.output.seurat_object,
+    output:
+        umap_sample=config["processed_dir"] + "umap_sample.svg",
+        umap_stress_sig_classification=config["processed_dir"] +
+        "umap_stress_sig_classification.svg",
+        # umap_stress_sig_score=config["processed_dir"] + "umap_stress_sig_score.svg",
+        umap_stress_sig_score_q100=config["processed_dir"] +
+        "umap_stress_sig_score_q100.svg",
+        umap_stress_sig_score_q99=config["processed_dir"] +
+        "umap_stress_sig_score_q99.svg",
+        umap_stress_sig_score_blue=config["processed_dir"] +
+        "umap_stress_sig_score_blue.svg",
+    conda:
+        "envs/DB_AKC_R.yaml"
+    script:
+        "src/smk/visualization/plot_stress_signature.R"
 
 
 rule export_seurat_data:
@@ -238,51 +273,99 @@ rule export_seurat_data:
 zarr_dir = config["processed_dir"] + "zarr_files/"
 
 
-rule scarf_import_and_split_on_incubation:
-    input:
-        filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5",
-        seurat_metadata=rules.export_seurat_data.output.metadata,
-    output:
-        zarr_all=directory(zarr_dir + "all.zarr"),
-        zarr_ice=directory(zarr_dir + "ice.zarr"),
-        zarr_37c=directory(zarr_dir + "37c.zarr"),
-    conda:
-        "envs/DB_AKC_scarf.yaml"
-    params:
-        threads=config["n_threads"],
-    script:
-        "src/smk/scarf_import_and_split_on_incubation.py"
+# rule scarf_import_and_split_on_incubation:
+#     input:
+#         filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5",
+#         seurat_metadata=rules.export_seurat_data.output.metadata,
+#     output:
+#         zarr_all=directory(zarr_dir + "all.zarr"),
+#         zarr_ice=directory(zarr_dir + "ice.zarr"),
+#         zarr_37c=directory(zarr_dir + "37c.zarr"),
+#     conda:
+#         "envs/DB_AKC_scarf.yaml"
+#     params:
+#         threads=config["n_threads"],
+#     script:
+#         "src/smk/scarf_import_and_split_on_incubation.py"
 
 
-rule scarf_make_ice_reference:
-    input:
-        zarr_ice=rules.scarf_import_and_split_on_incubation.output.zarr_ice,
-    output:
-        ice_reference_marker=touch(".smk_markers/ice_reference_marker.done"),
-    conda:
-        "envs/DB_AKC_scarf.yaml"
-    params:
-        threads=config["n_threads"],
-    script:
-        "src/smk/scarf_make_ice_reference.py"
+# rule scarf_make_ice_reference:
+#     input:
+#         zarr_ice=rules.scarf_import_and_split_on_incubation.output.zarr_ice,
+#     output:
+#         ice_reference_marker=touch(".smk_markers/ice_reference_marker.done"),
+#     conda:
+#         "envs/DB_AKC_scarf.yaml"
+#     params:
+#         threads=config["n_threads"],
+#     script:
+#         "src/smk/scarf_make_ice_reference.py"
 
 
-scarf_dir = config["processed_dir"] + "scarf/"
+# scarf_dir = config["processed_dir"] + "scarf/"
 
 
-rule scarf_plot_ice_reference:
-    input:
-        zarr_ice=rules.scarf_import_and_split_on_incubation.output.zarr_ice,
-        ice_reference_marker=rules.scarf_make_ice_reference.output.ice_reference_marker,
-    output:
-        plot_umap_clusters=scarf_dir + "ice_umap_clusters.svg",
-        # plot_umap_buffer_treatment=scarf_dir + "ice_umap_buffer_treatment.svg",
-        # plot_umap_hto=scarf_dir + "ice_umap_hto.svg",
-        plot_umap_phase=scarf_dir + "ice_umap_phase.svg",
-        plot_umap_sample=scarf_dir + "ice_umap_sample.svg",
-    conda:
-        "envs/DB_AKC_scarf.yaml"
-    params:
-        threads=config["n_threads"],
-    script:
-        "src/smk/scarf_plot_ice_reference.py"
+# rule scarf_plot_ice_reference:
+#     input:
+#         zarr_ice=rules.scarf_import_and_split_on_incubation.output.zarr_ice,
+#         ice_reference_marker=rules.scarf_make_ice_reference.output.ice_reference_marker,
+#     output:
+#         plot_umap_clusters=scarf_dir + "ice_umap_clusters.svg",
+#         # plot_umap_buffer_treatment=scarf_dir + "ice_umap_buffer_treatment.svg",
+#         # plot_umap_hto=scarf_dir + "ice_umap_hto.svg",
+#         plot_umap_phase=scarf_dir + "ice_umap_phase.svg",
+#         plot_umap_sample=scarf_dir + "ice_umap_sample.svg",
+#     conda:
+#         "envs/DB_AKC_scarf.yaml"
+#     params:
+#         threads=config["n_threads"],
+#     script:
+#         "src/smk/scarf_plot_ice_reference.py"
+
+
+# rule scarf_make_37c_targets:
+#     input:
+#         zarr_37c=rules.scarf_import_and_split_on_incubation.output.zarr_37c,
+#     output:
+#         zarr_37c_t=directory(zarr_dir + "37c_t.zarr"),
+#         zarr_37c_no_t=directory(zarr_dir + "37c_no_t.zarr"),
+#         # 37_targets_marker=touch(".smk_markers/37_targets_marker.done"),
+#     conda:
+#         "envs/DB_AKC_scarf.yaml"
+#     params:
+#         threads=config["n_threads"],
+#     script:
+#         "src/smk/scarf_make_37c_targets.py"
+
+
+# rule scarf_plot_37c_targets:
+#     input:
+#         zarr_37c_t=rules.scarf_make_37c_targets.output.zarr_37c_t,
+#         zarr_37c_no_t=rules.scarf_make_37c_targets.output.zarr_37c_no_t,
+#     output:
+#         plot_umap_clusters_37c_t=scarf_dir + "umap_clusters_37c_t.svg",
+#         plot_umap_phase_37c_t=scarf_dir + "umap_phase_37c_t.svg",
+#         plot_umap_sample_37c_t=scarf_dir + "umap_sample_37c_t.svg",
+#         plot_umap_clusters_37c_no_t=scarf_dir + "umap_clusters_37c_no_t.svg",
+#         plot_umap_phase_37c_no_t=scarf_dir + "umap_phase_37c_no_t.svg",
+#         plot_umap_sample_37c_no_t=scarf_dir + "umap_sample_37c_no_t.svg",
+#     conda:
+#         "envs/DB_AKC_scarf.yaml"
+#     params:
+#         threads=config["n_threads"],
+#     script:
+#         "src/smk/scarf_plot_37c_targets.py"
+
+
+# rule seurat_explore_pca_loadings:
+#     input:
+#         seurat_object=rules.seurat_processing_all.output.seurat_object,
+#     output:
+#         csvs=...,
+#         plots=...,
+#     conda:
+#         "envs/DB_AKC_scarf.yaml"
+#     script:
+#         "src/smk/seurat_explore_pca_loadings.R"
+
+

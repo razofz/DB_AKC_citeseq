@@ -32,10 +32,14 @@ for (i in seq_len(length(snakemake@config[["samples"]]))) {
       "no_triptolide"
   }
   if (i %in% snakemake@config[["sample_groups"]][["37c"]]) {
-    sobj[["incubation_method"]][sobj[["incubation_method"]] == str_c("HTO", i)] <-
+    sobj[["incubation_method"]][
+      sobj[["incubation_method"]] == str_c("HTO", i)
+    ] <-
       "37c"
   } else if (i %in% snakemake@config[["sample_groups"]][["ice"]]) {
-    sobj[["incubation_method"]][sobj[["incubation_method"]] == str_c("HTO", i)] <-
+    sobj[["incubation_method"]][
+      sobj[["incubation_method"]] == str_c("HTO", i)
+    ] <-
       "ice"
   }
 }

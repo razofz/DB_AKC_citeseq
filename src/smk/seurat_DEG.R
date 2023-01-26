@@ -10,7 +10,10 @@ set.seed(snakemake@config[["seed"]])
 
 
 find_markers_on_cells <- function(obj, assay, cells_1, cells_2, output_name) {
-  print(paste0("> Finding differentially expressed genes for ", output_name, ".."))
+  print(paste0(
+    "> Finding differentially expressed genes for ", output_name,
+    ".."
+  ))
   markers_df <- FindMarkers(obj[[assay]],
     test.use = "wilcox",
     cells.1 = cells_1,
@@ -86,7 +89,7 @@ for (phase in c("S", "G1", "G2M")) {
     obj = sobj, assay = "RNA",
     cells_1 = intersect(cells$ice_t, cells[[phase]]),
     cells_2 = intersect(cells$i37c_t, cells[[phase]]),
-    output_name = str_c("deg_", phase, "_triptolides")
+    output_name = str_c("deg_", phase, "_ice_t_vs_37c_t")
   )
 }
 
@@ -95,15 +98,23 @@ for (phase in c("S", "G1", "G2M")) {
     obj = sobj, assay = "RNA",
     cells_1 = intersect(cells$ice_no_t, cells[[phase]]),
     cells_2 = intersect(cells$i37c_no_t, cells[[phase]]),
-    output_name = str_c("deg_", phase, "_no_triptolides")
+    output_name = str_c("deg_", phase, "_ice_no_t_vs_37c_no_t")
   )
 }
 
 for (phase in c("S", "G1", "G2M")) {
   find_markers_on_cells(
     obj = sobj, assay = "RNA",
-    cells_1 = intersect(cells$i37c_t, cells[[phase]]),
-    cells_2 = intersect(cells$i37c_no_t, cells[[phase]]),
+    cells_1 = intersect(cells$i37c_no_t, cells[[phase]]),
+    cells_2 = intersect(cells$i37c_t, cells[[phase]]),
     output_name = str_c("deg_", phase, "_37c_no_t_vs_37c_t")
+  )
+}
+for (phase in c("S", "G1", "G2M")) {
+  find_markers_on_cells(
+    obj = sobj, assay = "RNA",
+    cells_1 = intersect(cells$ice_no_t, cells[[phase]]),
+    cells_2 = intersect(cells$ice_t, cells[[phase]]),
+    output_name = str_c("deg_", phase, "_ice_no_t_vs_ice_t")
   )
 }
