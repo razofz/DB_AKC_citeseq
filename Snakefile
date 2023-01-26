@@ -4,6 +4,26 @@ import os
 configfile: "config.yaml"
 
 
+raw_counts_dir = config["interim_dir"] + "raw_counts_htos/"
+cellhashr_dir = config["processed_dir"] + "cellhashr_output/"
+HTO_out_dir = config["processed_dir"] + "HTO_demultiplexed/"
+filtering_dir = config["processed_dir"] + "seurat_filtering/"
+seurat_processing_all_dir = config["processed_dir"] + "seurat_processing_all/"
+deg_dir = config["processed_dir"] + "deg/"
+zarr_dir = config["processed_dir"] + "zarr_files/"
+
+
+rule gather:
+    input:
+        filtering_dir + "pre_RNA.svg",
+        filtering_dir + "post_RNA.svg",
+        seurat_processing_all_dir + "umap_cellcycle.svg",
+        deg_dir + "deg_S_ice_t_vs_37c_t.tsv",
+        config["processed_dir"] + "seurat_object_w_stress_sig.rds",
+        config["processed_dir"] + "umap_sample.svg",
+        seurat_processing_all_dir + "umap_embeddings.csv",
+
+
 rule produce_unprocessed_seurat_object:
     input:
         filtered_h5=config["raw_dir"] + "filtered_feature_bc_matrix.h5",
@@ -15,9 +35,6 @@ rule produce_unprocessed_seurat_object:
         "envs/DB_AKC_R.yaml"
     script:
         "src/smk/demultiplexing/pre_cellhashr_seuratobject.R"
-
-
-raw_counts_dir = config["interim_dir"] + "raw_counts_htos/"
 
 
 rule write_raw_counts_hto:
@@ -48,7 +65,6 @@ rule gzip_raw_counts_hto:
         "for file in {input}; do gzip --keep $file; done"
 
 
-cellhashr_dir = config["processed_dir"] + "cellhashr_output/"
 
 
 rule run_cellhashr:
@@ -72,9 +88,6 @@ rule run_cellhashr:
         "src/smk/demultiplexing/run_cellhashr.R"
 
 
-HTO_out_dir = config["processed_dir"] + "HTO_demultiplexed/"
-
-
 rule post_cellhashr:
     input:
         seurat_object_unprocessed=rules.produce_unprocessed_seurat_object.output.seurat_object_unprocessed,
@@ -85,9 +98,6 @@ rule post_cellhashr:
         "envs/DB_AKC_R.yaml"
     script:
         "src/smk/demultiplexing/post_cellhashr.R"
-
-
-filtering_dir = config["processed_dir"] + "seurat_filtering/"
 
 
 rule plot_prefiltering:
@@ -144,9 +154,6 @@ rule plot_filtered:
         "src/smk/visualization/plot_filtered.R"
 
 
-seurat_processing_all_dir = config["processed_dir"] + "seurat_processing_all/"
-
-
 rule seurat_processing_all:
     input:
         seurat_object=rules.filtering.output.seurat_object,
@@ -193,9 +200,6 @@ rule plot_umap:
         "envs/DB_AKC_R.yaml"
     script:
         "src/smk/visualization/plot_umap.R"
-
-
-deg_dir = config["processed_dir"] + "deg/"
 
 
 rule seurat_deg:
@@ -268,9 +272,6 @@ rule export_seurat_data:
         "envs/DB_AKC_R.yaml"
     script:
         "src/smk/seurat_export_data.R"
-
-
-zarr_dir = config["processed_dir"] + "zarr_files/"
 
 
 # rule scarf_import_and_split_on_incubation:
