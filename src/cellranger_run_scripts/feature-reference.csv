@@ -1,0 +1,9 @@
+id,name,read,pattern,sequence,feature_type
+CD48,CD48-TotalSeq-A0429,R2,^(BC),AGAACCGCCGTAGTT,Antibody Capture
+CD150,CD150-TotalSeq-A0203,R2,^(BC),CAACGCCTAGAAACC,Antibody Capture
+CD135,CD135-TotalSeq-A0098,R2,^(BC),GTAGCAAGATTCAAG,Antibody Capture
+CD201,CD201-TotalSeq-A0439,R2,^(BC),TATGATCTGCCCTTG,Antibody Capture
+HTO1,HTO1-TotalSeq-A0301,R2,^(BC),ACCCACCAGTAAGAC,Antibody Capture
+HTO2,HTO2-TotalSeq-A0302,R2,^(BC),GGTCGAGAGCATTCA,Antibody Capture
+HTO3,HTO3-TotalSeq-A0303,R2,^(BC),CTTGCCGCATGTCAT,Antibody Capture
+HTO4,HTO4-TotalSeq-A0304,R2,^(BC),AAAGCATTCTTCACG,Antibody Capture
