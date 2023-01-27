@@ -65,8 +65,6 @@ rule gzip_raw_counts_hto:
         "for file in {input}; do gzip --keep $file; done"
 
 
-
-
 rule run_cellhashr:
     input:
         barcodes=rules.gzip_raw_counts_hto.output.barcodes,
