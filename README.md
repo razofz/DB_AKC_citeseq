@@ -9,8 +9,10 @@ Lab at Lund University.
 Project Organization
 ------------
 
-    ├── envs                        <- Environment specification files.
-    ├── README.md                   <- The top-level README for developers using this project.
+    ├── envs                        <- Environment specification files, for conda/mamba.
+    ├── README.md                   <- This README.
+    ├── Snakefile                   <- The Snakefile for running this analysis with Snakemake.
+    ├── config.yaml                 <- The config file for the Snakemake workflow.
     ├── data
     │   ├── external                <- Data from third party sources.
     │   ├── interim                 <- Intermediate data that has been transformed.
@@ -19,7 +21,9 @@ Project Organization
     ├── references                  <- Data dictionaries, manuals, and all other explanatory materials.
     ├── src                         <- Source code for use in this project.
     │   ├── cellranger_run_scripts  <- The script for running cellranger through slurm on the cluster.
-    │   └── smk                     <- Scripts for snakemake workflow.
+    │   └── smk                     <- Scripts for the snakemake workflow.
+    ├── .envrc                      <- A file for dotenv to create the environment variable PROJECT_PATH;
+    │                                  useful for referring to the project top directory from anywhere in the project.
     └── tox.ini                     <- tox file with settings for running tox; see tox.readthedocs.io
 
 --------
