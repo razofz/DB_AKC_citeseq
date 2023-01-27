@@ -22,7 +22,7 @@ Project Organization
     ├── src                         <- Source code for use in this project.
     │   ├── cellranger_run_scripts  <- The script for running cellranger through slurm on the cluster.
     │   └── smk                     <- Scripts for the snakemake workflow.
-    ├── .envrc                      <- A file for dotenv to create the environment variable PROJECT_PATH;
+    ├── .envrc                      <- A file for direnv to create the environment variable PROJECT_PATH;
     │                                  useful for referring to the project top directory from anywhere in the project.
     └── tox.ini                     <- tox file with settings for running tox; see tox.readthedocs.io
 
