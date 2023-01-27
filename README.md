@@ -9,19 +9,18 @@ Lab at Lund University.
 Project Organization
 ------------
 
-    ├── envs               <- Environment specification files.
-    ├── README.md          <- The top-level README for developers using this project.
+    ├── envs                        <- Environment specification files.
+    ├── README.md                   <- The top-level README for developers using this project.
     ├── data
-    │   ├── adhoc          <- Dir for interactive explorations and later formalisation.
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The results.
-    │   └── raw            <- The original, immutable data dump.
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    ├── src                <- Source code for use in this project.
-    │   └── smk            <- Scripts for snakemake workflow.
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+    │   ├── external                <- Data from third party sources.
+    │   ├── interim                 <- Intermediate data that has been transformed.
+    │   ├── processed               <- The results.
+    │   └── raw                     <- The original, immutable data dump.
+    ├── references                  <- Data dictionaries, manuals, and all other explanatory materials.
+    ├── src                         <- Source code for use in this project.
+    │   ├── cellranger_run_scripts  <- The script for running cellranger through slurm on the cluster.
+    │   └── smk                     <- Scripts for snakemake workflow.
+    └── tox.ini                     <- tox file with settings for running tox; see tox.readthedocs.io
 
 --------
 
