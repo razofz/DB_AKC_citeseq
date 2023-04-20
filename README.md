@@ -9,22 +9,66 @@ Lab at Lund University.
 Project Organization
 ------------
 
-    ├── envs                        <- Environment specification files, for conda/mamba.
     ├── README.md                   <- This README.
-    ├── Snakefile                   <- The Snakefile for running this analysis with Snakemake.
-    ├── config.yaml                 <- The config file for the Snakemake workflow.
+    ├── Snakefile                   <- The Snakefile for running this analysis with [Snakemake](https://snakemake.readthedocs.io/en/stable/). Specifies the rules for the Snakemake pipeline; which scripts to run on which file(s) etc.
+    ├── config.yaml                 <- The configuration file for the Snakemake pipeline (read by the Snakefile). Contains information to be used programmatically, e.g. sample names, HTO mapping to samples, output folders, seed for random number generation, filtering parameters etc.
     ├── data
     │   ├── external                <- Data from third party sources.
     │   ├── interim                 <- Intermediate data that has been transformed.
     │   ├── processed               <- The results.
     │   └── raw                     <- The original, immutable data dump.
+    ├── envs                        <- Conda/mamba environment specification files, which packages and what version was used in this analysis. Read by the Snakefile, and snakemake will automatically create those environments and run the rules (scripts) in them.
+    ├── LICENSE                     <- An open source license statement.
     ├── references                  <- Data dictionaries, manuals, and all other explanatory materials.
     ├── src                         <- Source code for use in this project.
     │   ├── cellranger_run_scripts  <- The script for running cellranger through slurm on the cluster.
     │   └── smk                     <- Scripts for the snakemake workflow.
     ├── .envrc                      <- A file for direnv to create the environment variable PROJECT_PATH;
     │                                  useful for referring to the project top directory from anywhere in the project.
-    └── tox.ini                     <- tox file with settings for running tox; see tox.readthedocs.io
+    ├── smk_rulegraph.pdf           <- A diagram showing the rule flow in the snakemake pipeline.
+    ├── smk_filegraph.pdf           <- A diagram showing the input and output files for each rule in the snakemake pipeline.
+    └── tox.ini                     <- tox file with settings for running tox; see [here](https://tox.readthedocs.io)
+
+--------
+
+For the best reproduction of results, install conda (or a derivative) and create
+the `envs/DB_AKC_snakemake.yaml` environment, then run snakemake in that. For
+more detailed information on this:
+
+Install [conda](https://docs.conda.io/en/latest/) (or even better,
+[mamba](https://github.com/mamba-org/mamba)), and then each environment can be
+generated with the command `conda env create -f <environment_file.yaml>`.
+(Don't forget to also activate each environment after creation before running
+the Snakefile (or any scripts, if you want to run them manually).) (note: if
+you already have an environment with the same name, you can e. g. change the
+name in the first line of corresponding .yaml file to avoid conflict errors.)
+
+You could of course install snakemake and related packages any other preferred
+way, but above described method will give you the exact same environment as was
+used for the results described in the paper.
+
+The data generated in this study can be found on GEO under the accession number
+[GSE224590](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE224590).
+Published datasets used for the analysis were retrieved from GEO using
+accession numbers: GSE27686, GSE44923, GSE55525, GSE6503, GSE48893, GSE39553,
+GSE47817GSE127522, GSE128050, GSE151333, GSE156807, GSE109546, GSE157455 and
+GSE165982.
+
+If you want the convenience of the PROJECT_PATH environment variable, please
+create the file `project_path` with the content 'your local path to this
+folder'. For example, if your username is `bioinf` and this folder (directory)
+is called `DB_AKC` and resides in your home directory, the `project_path` file
+should contain:
+
+    /home/bioinf/DB_AKC
+
+You can also use [direnv](https://direnv.net/) for automatic loading of the env
+var, see the included `.envrc` file (which also reads the `project_path` file).
+
+This project is runnable in its current form on Unix systems (Linux or macOS),
+i. e. not Windows. The paths are specified with a forward slash. If you are
+using Windows and want to reproduce these results, one suggestion would be to
+use WSL2 (Windows Subsystem for Linux).
 
 --------
 
