@@ -19,6 +19,7 @@ Project Organization
     │   └── raw                     <- The original, immutable data dump.
     ├── envs                        <- Conda/mamba environment specification files, which packages and what version was used in this analysis. Read by the Snakefile, and snakemake will automatically create those environments and run the rules (scripts) in them.
     ├── LICENSE                     <- An open source license statement.
+    ├── notebooks                   <- Jupyter notebooks (used mostly for the revision). Includes the notebooks (.ipynb format) as well as Jupytext-converted .R files, and Quarto-rendered html and md from the ipynb file.
     ├── references                  <- Data dictionaries, manuals, and all other explanatory materials.
     ├── src                         <- Source code for use in this project.
     │   ├── cellranger_run_scripts  <- The script for running cellranger through slurm on the cluster.
