@@ -1,5 +1,7 @@
-An Erratic Gene Expression Signature in Primary Hematopoietic Stem Cells: Implications for Interpretations of Aging
+Implications of stress-induced gene expression for hematopoietic stem cell aging studies
 ==============================
+
+Paper in Nature Aging [here](https://www.nature.com/articles/s43587-023-00558-z).
 
 **Authors**: Anna Konturek-Ciesla, Rasmus Olofzon, Shabnam Kharazi, David Bryder
 
